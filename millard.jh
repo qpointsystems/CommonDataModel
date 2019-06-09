@@ -1,0 +1,105 @@
+entity Organization {
+	externalId Identifier required,
+    active Boolean required,
+    type CodableConcept required
+}
+
+entity EntityAlias {
+	alias String
+}
+
+entity EntityName {
+	name String
+}
+
+entity Address {
+	use String required,
+    type String required,
+    text String required,
+    line1 String required,
+    line2 String,
+    line3 String,
+    city String,
+    district String,
+    state String,
+    postalCode String,
+    country String,
+    period Period
+}
+
+entity ContactPoint {
+	system String,
+    value String,
+    use String,
+    rank Integer,
+    period Period
+}
+
+entity Identifier {
+	use String required,
+    type CodableConcept required,
+    system String required,
+    value String required,
+    period Period,
+    assigner Reference
+}
+
+entity Reference {
+	reference String,
+    type String,
+    identifier Identifier,
+    display String
+}
+
+entity Coding {
+	system String required,
+    version String required,
+    code String required,
+    display String required,
+    userSelected Boolean
+}
+
+entity Period {
+	start Instant required,
+    end Instant
+}
+
+relationship OneToOne {
+	Reference{identifier} to Identifier
+}
+
+entity CodableConcept {
+	coding Coding required,
+    text String required
+}
+
+relationship ManyToOne {
+	EntityAlias{organization} to Organization{entityAlias},
+    EntityName{organization} to Organization{entityName},
+    Address{organization} to Organization{address},
+    ContactPoint{organization} to Organization{contactPoint}
+}
+
+relationship OneToOne {
+	Organization{externalId} to Identifier,
+    Organization{type} to CodableConcept
+}
+
+relationship OneToOne {
+	Address{period} to Period    
+}
+relationship OneToOne {
+    ContactPoint{period} to Period
+}
+relationship OneToOne {
+	Identifier{type} to CodableConcept,
+	Identifier{period} to Period,
+    Identifier{assigner} to Reference
+}
+
+relationship OneToOne {
+	CodableConcept{coding} to Coding
+}
+
+dto * with mapstruct
+service all with serviceImpl
